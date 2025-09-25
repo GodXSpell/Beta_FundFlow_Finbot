@@ -7,7 +7,7 @@ import com.finbot.Beta.Dto.UserResponseDto;
 import com.finbot.Beta.Exceptions.UserAlreadyExistsException;
 import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.UserRepository;
-import com.finbot.Beta.servicesImpl.UserServiceImpl;
+import com.finbot.Beta.service.impl.UserServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

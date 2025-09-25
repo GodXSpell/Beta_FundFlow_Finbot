@@ -1,0 +1,43 @@
+# === Java build files ===
+target/
+build/
+
+# === Maven wrapper ===
+.mvn/
+mvnw
+mvnw.cmd
+
+# === IntelliJ IDEA ===
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# === Spring Tool Suite (STS) ===
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# === VS Code ===
+.vscode/
+
+# === NetBeans ===
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# === Environment Files ===
+.env
+
+# === Logs ===
+*.log
+
+# === OS Files ===
+.DS_Store
+Thumbs.db

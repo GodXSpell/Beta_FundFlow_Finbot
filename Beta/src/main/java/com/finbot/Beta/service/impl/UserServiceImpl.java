@@ -1,4 +1,4 @@
-package com.finbot.Beta.servicesImpl;
+package com.finbot.Beta.service.impl;
 
 import com.finbot.Beta.Dto.LoginDto;
 import com.finbot.Beta.Dto.SignupDto;
