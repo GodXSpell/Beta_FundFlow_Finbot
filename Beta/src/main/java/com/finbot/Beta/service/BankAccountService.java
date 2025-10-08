@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface BankAccountService {
-    BankAccountResponseDto createBankAccount(User user, BankAccountRequestDto request);
+    BankAccountResponseDto createBankAccount(UUID userId, BankAccountRequestDto request);
     List<BankAccountResponseDto> getUserBankAccounts(User user);
     BankAccountResponseDto getBankAccount(User user, UUID accountId);
     BankAccountResponseDto updateBankAccount(User user, UUID accountId, BankAccountRequestDto request);
