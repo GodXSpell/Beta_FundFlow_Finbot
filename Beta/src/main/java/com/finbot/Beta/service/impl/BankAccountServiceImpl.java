@@ -6,6 +6,7 @@ import com.finbot.Beta.Exceptions.ResourceNotFoundException;
 import com.finbot.Beta.entity.BankAccount;
 import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.BankAccountRepository;
+import com.finbot.Beta.repository.UserRepository;
 import com.finbot.Beta.service.BankAccountService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,13 @@ import java.util.stream.Collectors;
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
+    private final UserRepository UserRepository;
 
     @Override
     @Transactional
-    public BankAccountResponseDto createBankAccount(User user, BankAccountRequestDto request) {
+    public BankAccountResponseDto createBankAccount(UUID userId, BankAccountRequestDto request) {
+        User user = UserRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         BankAccount bankAccount = BankAccount.builder()
                 .user(user)
                 .name(request.getName())

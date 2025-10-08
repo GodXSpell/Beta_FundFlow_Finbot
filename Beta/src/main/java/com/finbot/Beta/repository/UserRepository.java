@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
       Optional<User> findByEmailAndPassword(String email, String password); //Method will come handy when changing password
-
+      Optional<User> findById(UUID userId);
       Optional<User> findByEmail(String mail);
 }

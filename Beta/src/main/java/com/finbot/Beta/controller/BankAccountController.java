@@ -20,16 +20,16 @@ import java.util.UUID;
 public class BankAccountController {
     private final BankAccountService bankAccountService;
 
-    @PostMapping
+    @PostMapping("/create/{userId}")
     public ResponseEntity<BankAccountResponseDto> createBankAccount(
-            @AuthenticationPrincipal User user,
+            @RequestParam UUID userId,
             @Valid @RequestBody BankAccountRequestDto request) {
 
-        BankAccountResponseDto response = bankAccountService.createBankAccount(user, request);
+        BankAccountResponseDto response = bankAccountService.createBankAccount(userId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/userBankAccounts")
     public ResponseEntity<List<BankAccountResponseDto>> getUserBankAccounts(
             @AuthenticationPrincipal User user) {
 
