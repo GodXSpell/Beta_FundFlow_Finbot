@@ -1,5 +1,6 @@
 package com.finbot.Beta.servicesTest;
 
+import com.finbot.Beta.Dto.AuthResponseDto;
 import com.finbot.Beta.Dto.LoginDto;
 import com.finbot.Beta.Dto.SignupDto;
 import com.finbot.Beta.Dto.UpdatedUserDto;
@@ -7,6 +8,7 @@ import com.finbot.Beta.Dto.UserResponseDto;
 import com.finbot.Beta.Exceptions.UserAlreadyExistsException;
 import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.UserRepository;
+import com.finbot.Beta.security.JWTtokenizer;
 import com.finbot.Beta.service.impl.UserServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -32,6 +35,9 @@ public class UserServiceImplTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private JWTtokenizer jwtTokenizer;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -144,13 +150,18 @@ public class UserServiceImplTest {
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("securepass", "encodedPassword")).thenReturn(true);
+        when(jwtTokenizer.generateToken(userId.toString())).thenReturn("test.jwt.token");
 
-        UserResponseDto response = userService.loginUser(loginDto);
+        AuthResponseDto response = userService.loginUser(loginDto);
 
-        assertEquals("Test User", response.getName());
-        assertEquals("test@example.com", response.getEmail());
+        assertEquals("Bearer", response.getTokenType());
+        assertEquals("test.jwt.token", response.getToken());
+        assertNotNull(response.getUser());
+        assertEquals("Test User", response.getUser().getName());
+        assertEquals("test@example.com", response.getUser().getEmail());
         verify(passwordEncoder).matches("securepass", "encodedPassword");
         verify(userRepository).findByEmail("test@example.com");
+        verify(jwtTokenizer).generateToken(userId.toString());
     }
 
     @Test

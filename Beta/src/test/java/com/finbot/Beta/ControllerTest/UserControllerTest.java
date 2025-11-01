@@ -78,10 +78,16 @@ public class UserControllerTest {
                 .password("password123")
                 .build();
 
-        UserResponseDto responseDto = UserResponseDto.builder()
+        UserResponseDto userDto = UserResponseDto.builder()
                 .id(uuidString)
                 .name("Example Name")
                 .email("test@example.com")
+                .build();
+
+        AuthResponseDto responseDto = AuthResponseDto.builder()
+                .token("eyJhbGciOiJIUzI1NiJ9.test.token")
+                .tokenType("Bearer")
+                .user(userDto)
                 .build();
 
         when(userService.loginUser(any(LoginDto.class)))
@@ -91,9 +97,11 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(uuidString))
-                .andExpect(jsonPath("$.name").value("Example Name"))
-                .andExpect(jsonPath("$.email").value("test@example.com"));
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.user.id").value(uuidString))
+                .andExpect(jsonPath("$.user.name").value("Example Name"))
+                .andExpect(jsonPath("$.user.email").value("test@example.com"));
     }
 
     @Test

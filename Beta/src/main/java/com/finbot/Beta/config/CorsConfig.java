@@ -17,6 +17,7 @@ public class CorsConfig {
 //        System.out.println(">>> CorsFilter initialized");
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
+                "http://10.50.3.169:3000",
                 "http://localhost:5500",
                 "http://127.0.0.1:5500",
                 "http://10.30.22.61:5500",

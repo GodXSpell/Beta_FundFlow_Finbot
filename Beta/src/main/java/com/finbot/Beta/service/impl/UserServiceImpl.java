@@ -1,5 +1,6 @@
 package com.finbot.Beta.service.impl;
 
+import com.finbot.Beta.Dto.AuthResponseDto;
 import com.finbot.Beta.Dto.LoginDto;
 import com.finbot.Beta.Dto.SignupDto;
 import com.finbot.Beta.Dto.UpdatedUserDto;
@@ -8,6 +9,7 @@ import com.finbot.Beta.Exceptions.UserAlreadyExistsException;
 import com.finbot.Beta.Exceptions.UserNotFoundException;
 import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.UserRepository;
+import com.finbot.Beta.security.JWTtokenizer;
 import com.finbot.Beta.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JWTtokenizer jwtTokenizer;
 
     @Override
     public UserResponseDto registerUser(SignupDto signupDto) {
@@ -47,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto loginUser(LoginDto loginDto) {
+    public AuthResponseDto loginUser(LoginDto loginDto) {
         User user = userRepository.findByEmail(loginDto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
@@ -55,7 +58,15 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Invalid password");
         }
 
-        return toResponse(user);
+        // Generate JWT token
+        String token = jwtTokenizer.generateToken(user.getId().toString());
+
+        // Return authentication response with token
+        return AuthResponseDto.builder()
+                .token(token)
+                .tokenType("Bearer")
+                .user(toResponse(user))
+                .build();
     }
 
     @Override
