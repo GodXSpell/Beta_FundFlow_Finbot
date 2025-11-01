@@ -28,9 +28,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDto> loginUser(@RequestBody LoginDto loginDto) {
-        UserResponseDto loggedInUser = userService.loginUser(loginDto);
-        return ResponseEntity.ok(loggedInUser);
+    public ResponseEntity<AuthResponseDto> loginUser(@RequestBody LoginDto loginDto) {
+        AuthResponseDto authResponse = userService.loginUser(loginDto);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PutMapping("/update/password/{userId}")

@@ -1,0 +1,408 @@
+{
+  "info": {
+    "name": "FinBot API - Complete Test Suite",
+    "description": "Complete API testing suite with JWT authentication for FinBot application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1. Signup - Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test status code",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "// Test response structure",
+                  "pm.test(\"Response has user data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "});",
+                  "",
+                  "// Save userId for later tests",
+                  "if (jsonData.id) {",
+                  "    pm.collectionVariables.set('userId', jsonData.id);",
+                  "    console.log('User ID saved: ' + jsonData.id);",
+                  "}",
+                  "",
+                  "// Test response values",
+                  "pm.test(\"User registered successfully\", function () {",
+                  "    pm.expect(jsonData.name).to.eql('Test User');",
+                  "    pm.expect(jsonData.email).to.eql('testuser@example.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"confirmPassword\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "signup"]
+            },
+            "description": "Register a new user. This endpoint is public and doesn't require authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "2. Login - Get JWT Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test status code",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Parse response",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "// Test response structure",
+                  "pm.test(\"Response has token and user data\", function () {",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.expect(jsonData).to.have.property('tokenType');",
+                  "    pm.expect(jsonData).to.have.property('user');",
+                  "});",
+                  "",
+                  "// Save token and userId",
+                  "if (jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('JWT Token saved successfully');",
+                  "}",
+                  "",
+                  "if (jsonData.user && jsonData.user.id) {",
+                  "    pm.collectionVariables.set('userId', jsonData.user.id);",
+                  "    console.log('User ID saved: ' + jsonData.user.id);",
+                  "}",
+                  "",
+                  "// Test token type",
+                  "pm.test(\"Token type is Bearer\", function () {",
+                  "    pm.expect(jsonData.tokenType).to.eql('Bearer');",
+                  "});",
+                  "",
+                  "// Test user data",
+                  "pm.test(\"User data is correct\", function () {",
+                  "    pm.expect(jsonData.user.email).to.eql('testuser@example.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "Login with credentials to get JWT token. The token is automatically saved for use in subsequent requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management (Protected)",
+      "item": [
+        {
+          "name": "3. Update Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"User data returned\", function () {",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"NewSecurePassword456!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/update/password/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "update", "password", "{{userId}}"]
+            },
+            "description": "Update user password. Requires JWT authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "4. Update Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Email updated successfully\", function () {",
+                  "    pm.expect(jsonData.email).to.eql('newemail@example.com');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"newemail@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/update/email/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "update", "email", "{{userId}}"]
+            },
+            "description": "Update user email. Requires JWT authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "5. Update All User Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"User details updated\", function () {",
+                  "    pm.expect(jsonData.name).to.eql('Updated Name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updatedemail@example.com\",\n  \"password\": \"BrandNewPassword789!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/updateAll/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "updateAll", "{{userId}}"]
+            },
+            "description": "Update all user details (name, email, password). Requires JWT authentication."
+          },
+          "response": []
+        },
+        {
+          "name": "6. Delete User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"User deleted successfully\", function () {",
+                  "    pm.expect(pm.response.text()).to.include('User deleted successfully');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/delete/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "delete", "{{userId}}"]
+            },
+            "description": "Delete user account. Requires JWT authentication. WARNING: This will permanently delete the user."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Unauthorized Access",
+      "item": [
+        {
+          "name": "Try Update Without Token (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 401 Unauthorized\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test(\"Error message present\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"HackerPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/update/password/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "update", "password", "{{userId}}"]
+            },
+            "description": "This request should fail with 401 Unauthorized because no JWT token is provided."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+
