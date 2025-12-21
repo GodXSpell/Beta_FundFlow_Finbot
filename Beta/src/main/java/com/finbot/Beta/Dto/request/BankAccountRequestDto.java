@@ -1,6 +1,8 @@
 package com.finbot.Beta.Dto.request;
 
+import com.finbot.Beta.entity.AccountType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,11 +19,13 @@ public class BankAccountRequestDto {
     @NotBlank(message = "Account name is required")
     private String name;
 
+    private String bankName;
+
+    private String accountNumber;
+
     @PositiveOrZero(message = "Initial balance must be positive or zero")
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @NotBlank(message = "Account type is required")
-    private String accountType;
-
-    private String bankName;
+    @NotNull(message = "Account type is required")
+    private AccountType accountType;
 }

@@ -22,7 +22,7 @@ public class BankAccountController {
 
     @PostMapping("/create/{userId}")
     public ResponseEntity<BankAccountResponseDto> createBankAccount(
-            @RequestParam UUID userId,
+            @PathVariable UUID userId,
             @Valid @RequestBody BankAccountRequestDto request) {
 
         BankAccountResponseDto response = bankAccountService.createBankAccount(userId, request);

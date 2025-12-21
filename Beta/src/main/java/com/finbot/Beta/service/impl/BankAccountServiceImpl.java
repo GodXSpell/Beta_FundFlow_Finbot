@@ -1,5 +1,12 @@
 package com.finbot.Beta.service.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.finbot.Beta.Dto.request.BankAccountRequestDto;
 import com.finbot.Beta.Dto.response.BankAccountResponseDto;
 import com.finbot.Beta.Exceptions.ResourceNotFoundException;
@@ -8,26 +15,21 @@ import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.BankAccountRepository;
 import com.finbot.Beta.repository.UserRepository;
 import com.finbot.Beta.service.BankAccountService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class BankAccountServiceImpl implements BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
-    private final UserRepository UserRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
     public BankAccountResponseDto createBankAccount(UUID userId, BankAccountRequestDto request) {
-        User user = UserRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         BankAccount bankAccount = BankAccount.builder()
                 .user(user)
@@ -108,7 +110,7 @@ public class BankAccountServiceImpl implements BankAccountService {
                 .userId(bankAccount.getUser().getId())
                 .name(bankAccount.getName())
                 .balance(bankAccount.getBalance())
-                .accountType(bankAccount.getAccountType())
+                .accountType(bankAccount.getAccountType().name())
                 .bankName(bankAccount.getBankName())
                 .createdAt(bankAccount.getCreatedAt())
                 .updatedAt(bankAccount.getUpdatedAt())

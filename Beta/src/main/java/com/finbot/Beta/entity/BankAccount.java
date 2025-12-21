@@ -34,11 +34,15 @@ public class BankAccount {
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO; // Current balance of the bank account
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "account_type", nullable = false)
-    private String accountType; // Type of the bank account (e.g., savings, checking)
+    private AccountType accountType; // Type of the bank account (e.g., savings, checking)
 
     @Column(name = "bank_name")
     private String bankName; // Name of the bank
+
+    @Column(name = "account_number", length = 50)
+    private String accountNumber; // Bank account number
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -47,6 +51,7 @@ public class BankAccount {
     @UpdateTimestamp
     private LocalDateTime updatedAt; // Timestamp when the account was last updated
 
-    @Column(name = "active", nullable = false)
+    @Column(name = "is_active")
+    @Builder.Default
     private Boolean isActive = true; // Indicates if the bank account is active or not
 }
