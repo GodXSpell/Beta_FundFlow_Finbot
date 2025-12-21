@@ -31,12 +31,26 @@ public class BankAccountServiceImpl implements BankAccountService {
     public BankAccountResponseDto createBankAccount(UUID userId, BankAccountRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        // Check for duplicate account name
+        if (bankAccountRepository.existsByNameAndUserAndIsActiveTrue(request.getName(), user)) {
+            throw new IllegalArgumentException("Account with name '" + request.getName() + "' already exists");
+        }
+        
+        // Check for duplicate account number (if provided)
+        if (request.getAccountNumber() != null && !request.getAccountNumber().isEmpty()) {
+            if (bankAccountRepository.existsByAccountNumberAndUserAndIsActiveTrue(request.getAccountNumber(), user)) {
+                throw new IllegalArgumentException("Account with number '" + request.getAccountNumber() + "' already exists");
+            }
+        }
+        
         BankAccount bankAccount = BankAccount.builder()
                 .user(user)
                 .name(request.getName())
                 .balance(request.getBalance())
                 .accountType(request.getAccountType())
                 .bankName(request.getBankName())
+                .accountNumber(request.getAccountNumber())
                 .isActive(true)
                 .build();
 

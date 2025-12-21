@@ -2,7 +2,7 @@ package com.finbot.Beta.controller;
 
 import com.finbot.Beta.Dto.request.BankAccountRequestDto;
 import com.finbot.Beta.Dto.response.BankAccountResponseDto;
-import com.finbot.Beta.entity.User;
+import com.finbot.Beta.security.CustomUserDetails;
 import com.finbot.Beta.service.BankAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,48 +20,48 @@ import java.util.UUID;
 public class BankAccountController {
     private final BankAccountService bankAccountService;
 
-    @PostMapping("/create/{userId}")
+    @PostMapping("/create")
     public ResponseEntity<BankAccountResponseDto> createBankAccount(
-            @PathVariable UUID userId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody BankAccountRequestDto request) {
 
-        BankAccountResponseDto response = bankAccountService.createBankAccount(userId, request);
+        BankAccountResponseDto response = bankAccountService.createBankAccount(userDetails.getId(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/userBankAccounts")
+    @GetMapping("/all")
     public ResponseEntity<List<BankAccountResponseDto>> getUserBankAccounts(
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<BankAccountResponseDto> accounts = bankAccountService.getUserBankAccounts(user);
+        List<BankAccountResponseDto> accounts = bankAccountService.getUserBankAccounts(userDetails.getUser());
         return ResponseEntity.ok(accounts);
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/get/{accountId}")
     public ResponseEntity<BankAccountResponseDto> getBankAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID accountId) {
 
-        BankAccountResponseDto account = bankAccountService.getBankAccount(user, accountId);
+        BankAccountResponseDto account = bankAccountService.getBankAccount(userDetails.getUser(), accountId);
         return ResponseEntity.ok(account);
     }
 
-    @PutMapping("/{accountId}")
+    @PutMapping("/update/{accountId}")
     public ResponseEntity<BankAccountResponseDto> updateBankAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID accountId,
             @Valid @RequestBody BankAccountRequestDto request) {
 
-        BankAccountResponseDto response = bankAccountService.updateBankAccount(user, accountId, request);
+        BankAccountResponseDto response = bankAccountService.updateBankAccount(userDetails.getUser(), accountId, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{accountId}")
+    @DeleteMapping("/delete/{accountId}")
     public ResponseEntity<Void> deleteBankAccount(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID accountId) {
 
-        bankAccountService.deleteBankAccount(user, accountId);
+        bankAccountService.deleteBankAccount(userDetails.getUser(), accountId);
         return ResponseEntity.noContent().build();
     }
 }

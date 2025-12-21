@@ -15,4 +15,8 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, UUID> 
     List<BankAccount> findByUserAndIsActiveTrue(User user);
     Optional<BankAccount> findByIdAndUser(UUID id, User user);
     Optional<BankAccount> findByIdAndUserAndIsActiveTrue(UUID id, User user);
+    
+    // Check for duplicate accounts
+    boolean existsByAccountNumberAndUserAndIsActiveTrue(String accountNumber, User user);
+    boolean existsByNameAndUserAndIsActiveTrue(String name, User user);
 }
