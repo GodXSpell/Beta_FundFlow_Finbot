@@ -51,7 +51,7 @@ public class BankAccount {
     @UpdateTimestamp
     private LocalDateTime updatedAt; // Timestamp when the account was last updated
 
-    @Column(name = "is_active")
+    @Column(name = "active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     @Builder.Default
     private Boolean isActive = true; // Indicates if the bank account is active or not
 }
