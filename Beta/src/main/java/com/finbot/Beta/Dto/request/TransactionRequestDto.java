@@ -1,5 +1,6 @@
 package com.finbot.Beta.Dto.request;
 
+import com.finbot.Beta.entity.TransactionType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -25,8 +26,8 @@ public class TransactionRequestDto {
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 
-    @NotBlank(message = "Transaction type is required")
-    private String type; // CREDIT or DEBIT
+    @NotNull(message = "Transaction type is required")
+    private TransactionType type; // CREDIT or DEBIT
 
     private String category;
 

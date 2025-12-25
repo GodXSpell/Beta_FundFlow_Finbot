@@ -2,6 +2,7 @@ package com.finbot.Beta.controller;
 
 import com.finbot.Beta.Dto.ErrorResponseDto;
 import com.finbot.Beta.Exceptions.UserAlreadyExistsException;
+import com.finbot.Beta.Exceptions.ResourceNotFoundException;
 import com.finbot.Beta.Exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,17 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
         return new ResponseEntity<>(userNotFoundError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFound(ResourceNotFoundException ex) {
+        ErrorResponseDto resourceNotFoundError = ErrorResponseDto.builder()
+                .message("RESOURCE_NOT_FOUND")
+                .details(ex.getMessage())
+                .status(HttpStatus.NOT_FOUND.value()) // 404
+                .timestamp(LocalDateTime.now())
+                .build();
+        return new ResponseEntity<>(resourceNotFoundError, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
