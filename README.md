@@ -84,7 +84,7 @@ src/
    mvn spring-boot:run
    ```
 
-   The API will be available at: [http://localhost:8080](http://localhost:8080)
+   The API will be available at: [http://localhost:8080](http://localhost:8081)
 
 ---
 
@@ -94,7 +94,7 @@ To run the application with Docker:
 
 ```bash
 docker build -t beta-finbot .
-docker run -p 8080:8080 beta-finbot
+docker run -p 8080:8081 beta-finbot
 ```
 
 ---
