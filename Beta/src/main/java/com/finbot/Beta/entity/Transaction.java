@@ -39,8 +39,15 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal amount; // Amount of the transaction
 
+    @Column(name = "previous_balance")
+    private BigDecimal previousBalance; // Balance before the transaction
+
+    @Column(name = "new_balance")
+    private BigDecimal newBalance; // Balance after the transaction
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type; // CREDIT or DEBIT
+    private TransactionType type; // CREDIT or DEBIT
 
     @Column
     private String category; // Category of the transaction (e.g., groceries, entertainment)

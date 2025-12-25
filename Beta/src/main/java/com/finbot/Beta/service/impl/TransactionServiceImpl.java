@@ -6,6 +6,7 @@ import com.finbot.Beta.Exceptions.InsufficientFundsException;
 import com.finbot.Beta.Exceptions.ResourceNotFoundException;
 import com.finbot.Beta.entity.BankAccount;
 import com.finbot.Beta.entity.Transaction;
+import com.finbot.Beta.entity.TransactionType;
 import com.finbot.Beta.entity.User;
 import com.finbot.Beta.repository.BankAccountRepository;
 import com.finbot.Beta.repository.TransactionRepository;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,6 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final BudgetService budgetService;
 
     @Override
+    @Transactional
     public TransactionResponseDto createTransaction(User user, TransactionRequestDto request) {
         // Validate bank account
         BankAccount bankAccount = bankAccountRepository.findByIdAndUserAndIsActiveTrue(request.getBankAccountId(), user)
@@ -42,9 +45,9 @@ public class TransactionServiceImpl implements TransactionService {
         BigDecimal newBalance;
 
         //check for credit debit type and update the balance accordingly
-        if("CREDIT".equals(request.getType())){
+        if(TransactionType.CREDIT == request.getType()){
             newBalance = previousBalance.add(request.getAmount());
-        }else if("DEBIT".equals(request.getType())){
+        }else if(TransactionType.DEBIT == request.getType()){
             // Check if there are sufficient funds for debit transaction
             if (previousBalance.compareTo(request.getAmount()) < 0) {
                 throw new InsufficientFundsException("Insufficient funds in account");
@@ -63,16 +66,18 @@ public class TransactionServiceImpl implements TransactionService {
                 .category(request.getCategory())
                 .description(request.getDescription())
                 .transactionDate(request.getTransactionDate() != null ? request.getTransactionDate() : LocalDateTime.now())
+                .previousBalance(previousBalance)
+                .newBalance(newBalance)
                 .build();
 
         // Save transaction
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         // Update bank account balance
-        bankAccountService.updateBalance(bankAccount.getId(), request.getAmount(), request.getType());
+        bankAccountService.updateBalance(bankAccount.getId(), request.getAmount(), request.getType().name());
 
         // Update budget if it's a debit transaction with a category
-        if ("DEBIT".equals(request.getType()) && request.getCategory() != null) {
+        if (TransactionType.DEBIT == request.getType() && request.getCategory() != null) {
             budgetService.updateBudgetSpending(user, request.getCategory(), request.getAmount());
         }
 
@@ -83,7 +88,7 @@ public class TransactionServiceImpl implements TransactionService {
                 .bankAccountId(bankAccount.getId())
                 .bankAccountName(bankAccount.getName())
                 .amount(savedTransaction.getAmount())
-                .type(savedTransaction.getType())
+                .type(savedTransaction.getType().name())
                 .category(savedTransaction.getCategory())
                 .description(savedTransaction.getDescription())
                 .transactionDate(savedTransaction.getTransactionDate())
@@ -94,12 +99,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<TransactionResponseDto> getUserTransactions(User user, Pageable pageable) {
         return transactionRepository.findByUserOrderByTransactionDateDesc(user, pageable)
                 .map(this::mapToResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransactionResponseDto> getTransactionsByBankAccount(User user, UUID bankAccountId) {
         BankAccount bankAccount = bankAccountRepository.findByIdAndUserAndIsActiveTrue(bankAccountId, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));
@@ -110,6 +117,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransactionResponseDto> getTransactionsByDateRange(User user, LocalDateTime startDate, LocalDateTime endDate) {
         return transactionRepository.findByUserAndDateRange(user, startDate, endDate).stream()
                 .map(this::mapToResponse)
@@ -117,6 +125,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TransactionResponseDto> getTransactionsByCategory(User user, String category) {
         return transactionRepository.findByUserAndCategory(user, category).stream()
                 .map(this::mapToResponse)
@@ -124,6 +133,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TransactionResponseDto getTransaction(User user, UUID transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
@@ -143,10 +153,12 @@ public class TransactionServiceImpl implements TransactionService {
                 .bankAccountId(transaction.getBankAccount().getId())
                 .bankAccountName(transaction.getBankAccount().getName())
                 .amount(transaction.getAmount())
-                .type(transaction.getType())
+                .type(transaction.getType().name())
                 .category(transaction.getCategory())
                 .description(transaction.getDescription())
                 .transactionDate(transaction.getTransactionDate())
+                .previousBalance(transaction.getPreviousBalance())
+                .newBalance(transaction.getNewBalance())
                 .createdAt(transaction.getCreatedAt())
                 .build();
     }
