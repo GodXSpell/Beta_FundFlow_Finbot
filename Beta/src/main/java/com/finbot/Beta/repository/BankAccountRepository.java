@@ -3,6 +3,8 @@ package com.finbot.Beta.repository;
 import com.finbot.Beta.entity.BankAccount;
 import com.finbot.Beta.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,7 +17,10 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, UUID> 
     List<BankAccount> findByUserAndIsActiveTrue(User user);
     Optional<BankAccount> findByIdAndUser(UUID id, User user);
     Optional<BankAccount> findByIdAndUserAndIsActiveTrue(UUID id, User user);
-    
+
+    @Query("SELECT b FROM BankAccount b WHERE b.id = :id AND b.user.id = :userId AND b.isActive = true")
+    Optional<BankAccount> findByIdAndUserIdAndIsActiveTrue(@Param("id") UUID id, @Param("userId") UUID userId);
+
     // Check for duplicate accounts
     boolean existsByAccountNumberAndUserAndIsActiveTrue(String accountNumber, User user);
     boolean existsByNameAndUserAndIsActiveTrue(String name, User user);

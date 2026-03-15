@@ -35,4 +35,18 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return new CustomUserDetails(user);
     }
+    /*
+    // to uncomment this and comment above
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        // Return User directly - it implements UserDetails
+        return userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+    }
+
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    }
+    */
 }

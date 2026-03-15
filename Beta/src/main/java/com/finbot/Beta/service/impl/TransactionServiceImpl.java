@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,25 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     @Transactional
     public TransactionResponseDto createTransaction(User user, TransactionRequestDto request) {
+        // Debug logging
+        System.out.println("User ID: " + user.getId());
+        System.out.println("Bank Account ID requested: " + request.getBankAccountId());
+
+        Optional<BankAccount> anyAccount = bankAccountRepository.findById(request.getBankAccountId());
+
+        if (anyAccount.isEmpty()) {
+            throw new ResourceNotFoundException("Bank account with ID " + request.getBankAccountId() + " does not exist");
+        }
+
+        BankAccount account = anyAccount.get();
+        if (!account.getUser().getId().equals(user.getId())) {
+            throw new ResourceNotFoundException("Bank account belongs to different user. Expected: " + user.getId() + ", Found: " + account.getUser().getId());
+        }
+
+        if (account.getIsActive() == null || !account.getIsActive()) {
+            throw new ResourceNotFoundException("Bank account is inactive. isActive=" + account.getIsActive());
+        }
+
         // Validate bank account
         BankAccount bankAccount = bankAccountRepository.findByIdAndUserAndIsActiveTrue(request.getBankAccountId(), user)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank account not found"));

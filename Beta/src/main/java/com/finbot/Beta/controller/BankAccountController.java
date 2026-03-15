@@ -25,6 +25,8 @@ public class BankAccountController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody BankAccountRequestDto request) {
 
+        System.out.println("UserDetails: " + (userDetails != null ? userDetails.getId() : "NULL"));
+
         BankAccountResponseDto response = bankAccountService.createBankAccount(userDetails.getId(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
