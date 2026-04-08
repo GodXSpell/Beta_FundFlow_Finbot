@@ -1,0 +1,461 @@
+{
+  "info": {
+    "name": "FinBot API",
+    "description": "Postman collection for testing the FinBot API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication & User Management",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data && data.token) {",
+                  "    pm.collectionVariables.set(\"token\", data.token);",
+                  "}",
+                  "if (data && data.id) {",
+                  "    pm.collectionVariables.set(\"userId\", data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Update Password",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newPassword\": \"NewStrongPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/update/password/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "update", "password", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Email",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newEmail\": \"newemail@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/update/email/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "update", "email", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update All Details",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updatedemail@example.com\",\n  \"password\": \"UpdatedPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/updateAll/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "updateAll", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/delete/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "delete", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Bank Accounts",
+      "item": [
+        {
+          "name": "Create Bank Account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data && data.id) {",
+                  "    pm.collectionVariables.set(\"accountId\", data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Checking Account\",\n  \"bankName\": \"Chase\",\n  \"accountNumber\": \"123456789\",\n  \"balance\": 1500.00,\n  \"accountType\": \"CHECKING\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "accounts", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get All Bank Accounts",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "accounts", "all"]
+            }
+          }
+        },
+        {
+          "name": "Get Bank Account By ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/get/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "accounts", "get", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Bank Account",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Savings Account\",\n  \"bankName\": \"Chase\",\n  \"accountNumber\": \"123456789\",\n  \"balance\": 2000.00,\n  \"accountType\": \"SAVINGS\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/update/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "accounts", "update", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Bank Account",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/accounts/delete/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "accounts", "delete", "{{accountId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Budgets",
+      "item": [
+        {
+          "name": "Create Budget",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data && data.id) {",
+                  "    pm.collectionVariables.set(\"budgetId\", data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Groceries Budget\",\n  \"category\": \"Food\",\n  \"amount\": 500.00,\n  \"period\": \"MONTHLY\",\n  \"startDate\": \"2024-05-01\",\n  \"endDate\": \"2024-05-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/budgets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "budgets"]
+            }
+          }
+        },
+        {
+          "name": "Get All Budgets",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/budgets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "budgets"]
+            }
+          }
+        },
+        {
+          "name": "Get Budget By ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "budgets", "{{budgetId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Budget",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Groceries\",\n  \"category\": \"Food\",\n  \"amount\": 600.00,\n  \"period\": \"MONTHLY\",\n  \"startDate\": \"2024-05-01\",\n  \"endDate\": \"2024-05-31\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "budgets", "{{budgetId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Budget",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/budgets/{{budgetId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "budgets", "{{budgetId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Transactions",
+      "item": [
+        {
+          "name": "Create Transaction",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = pm.response.json();",
+                  "if (data && data.id) {",
+                  "    pm.collectionVariables.set(\"transactionId\", data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bankAccountId\": \"{{accountId}}\",\n  \"amount\": 50.00,\n  \"type\": \"DEBIT\",\n  \"category\": \"Groceries\",\n  \"description\": \"Walmart Shopping\",\n  \"transactionDate\": \"2024-05-15T14:30:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get All User Transactions",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions?page=0&size=20&sort=transactionDate,desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "sort", "value": "transactionDate,desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Account",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/account/{{accountId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "account", "{{accountId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Date Range",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/daterange?startDate=2024-05-01T00:00:00&endDate=2024-05-31T23:59:59",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "daterange"],
+              "query": [
+                { "key": "startDate", "value": "2024-05-01T00:00:00" },
+                { "key": "endDate", "value": "2024-05-31T23:59:59" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions by Category",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/category/Groceries",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "category", "Groceries"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction By ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/transactions/{{transactionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "transactions", "{{transactionId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "budgetId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

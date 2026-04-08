@@ -2,7 +2,7 @@ package com.finbot.Beta.controller;
 
 import com.finbot.Beta.Dto.request.BudgetRequestDto;
 import com.finbot.Beta.Dto.response.BudgetResponseDto;
-import com.finbot.Beta.entity.User;
+import com.finbot.Beta.security.CustomUserDetails;
 import com.finbot.Beta.service.BudgetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,46 +22,46 @@ public class BudgetController {
 
     @PostMapping
     public ResponseEntity<BudgetResponseDto> createBudget(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody BudgetRequestDto request) {
 
-        BudgetResponseDto response = budgetService.createBudget(user, request);
+        BudgetResponseDto response = budgetService.createBudget(userDetails.getUser(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<BudgetResponseDto>> getUserBudgets(
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        List<BudgetResponseDto> budgets = budgetService.getUserBudgets(user);
+        List<BudgetResponseDto> budgets = budgetService.getUserBudgets(userDetails.getUser());
         return ResponseEntity.ok(budgets);
     }
 
     @GetMapping("/{budgetId}")
     public ResponseEntity<BudgetResponseDto> getBudget(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID budgetId) {
 
-        BudgetResponseDto budget = budgetService.getBudget(user, budgetId);
+        BudgetResponseDto budget = budgetService.getBudget(userDetails.getUser(), budgetId);
         return ResponseEntity.ok(budget);
     }
 
     @PutMapping("/{budgetId}")
     public ResponseEntity<BudgetResponseDto> updateBudget(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID budgetId,
             @Valid @RequestBody BudgetRequestDto request) {
 
-        BudgetResponseDto response = budgetService.updateBudget(user, budgetId, request);
+        BudgetResponseDto response = budgetService.updateBudget(userDetails.getUser(), budgetId, request);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{budgetId}")
     public ResponseEntity<Void> deleteBudget(
-            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable UUID budgetId) {
 
-        budgetService.deleteBudget(user, budgetId);
+        budgetService.deleteBudget(userDetails.getUser(), budgetId);
         return ResponseEntity.noContent().build();
     }
 }
