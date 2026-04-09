@@ -125,7 +125,7 @@ Beta/
 
 ---
 
-## 🐳 Docker Support
+## 🐳 Docker Supportt
 
 To run the application inside a Docker container:
 
