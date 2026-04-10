@@ -21,7 +21,8 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://127.0.0.1:5500",
                 "http://10.30.22.61:5500",
-                "http://172.20.240.1:5500"
+                "http://172.20.240.1:5500",
+                "https://fundflow-two.vercel.app/"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
